@@ -368,26 +368,25 @@ Exemplo de erro:
 }
 ```
 
-## Testes
+## Testes manuais no localhost
 
-Para rodar os testes:
+Para rodar a API localmente:
 
 ```bash
-npm test
+npm install
+npm start
 ```
 
-Testes implementados:
+Depois disso, teste manualmente no Postman usando:
 
-- listar perifericos
-- filtrar por categoria
-- ordenar por preco
-- paginar resultados
-- buscar por id
-- criar periferico
-- validar campos obrigatorios
-- validar preco invalido
-- criar 5 perifericos via POST
+- `GET http://localhost:3000/`
+- `GET http://localhost:3000/api/perifericos`
+- `GET http://localhost:3000/api/perifericos?categoria=mouse`
+- `GET http://localhost:3000/api/perifericos?ordem=preco&direcao=asc`
+- `GET http://localhost:3000/api/perifericos?pagina=1&limite=2`
+- `GET http://localhost:3000/api/perifericos/1`
+- `POST http://localhost:3000/api/perifericos`
 
 ## Capturas de tela dos testes
 
-Os testes automatizados foram implementados no projeto, mas as capturas de tela do Postman precisam ser tiradas depois de executar a collection na sua maquina. O arquivo da collection ja esta pronto para isso.
+As capturas de tela devem ser feitas no Postman depois de testar a collection no seu `localhost`. O arquivo `postman_collection.json` ja esta pronto para importar.

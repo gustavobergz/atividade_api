@@ -4,8 +4,7 @@
   "description": "API REST basica para atividade de GET, filtro e POST com Express.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "node --test --test-isolation=none"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
