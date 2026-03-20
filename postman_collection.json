@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "API de Perifericos",
+    "_postman_id": "5d12f536-7f8d-4f90-bec0-atividade-aula-4",
+    "description": "Collection da atividade da aula 4 com GET, filtro e POST para a API de perifericos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET /",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "GET /perifericos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "GET /perifericos?categoria=mouse",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos?categoria=mouse"
+      }
+    },
+    {
+      "name": "GET /perifericos?ordem=preco&direcao=asc",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos?ordem=preco&direcao=asc"
+      }
+    },
+    {
+      "name": "GET /perifericos?pagina=1&limite=2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos?pagina=1&limite=2"
+      }
+    },
+    {
+      "name": "GET /perifericos/1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos/1"
+      }
+    },
+    {
+      "name": "POST 1 - Mouse Sem Fio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Mouse Sem Fio\",\n  \"categoria\": \"mouse\",\n  \"preco\": 90,\n  \"estoque\": 10\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "POST 2 - Teclado USB",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Teclado USB\",\n  \"categoria\": \"teclado\",\n  \"preco\": 110,\n  \"estoque\": 7\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "POST 3 - Microfone",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Microfone\",\n  \"categoria\": \"audio\",\n  \"preco\": 230,\n  \"estoque\": 5\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "POST 4 - Webcam Full HD",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Webcam Full HD\",\n  \"categoria\": \"video\",\n  \"preco\": 180,\n  \"estoque\": 4\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "POST 5 - Mousepad RGB",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Mousepad RGB\",\n  \"categoria\": \"acessorio\",\n  \"preco\": 70,\n  \"estoque\": 11\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "POST invalido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Produto sem preco\",\n  \"categoria\": \"mouse\"\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos"
+      }
+    }
+  ]
+}
