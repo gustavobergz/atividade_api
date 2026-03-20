@@ -1,15 +1,32 @@
 # API de Perifericos
 
-API simples feita em Node.js com Express, alinhada com o que aparece nas aulas 3 e 4:
+API simples feita em Node.js com Express, alinhada com o que aparece nas aulas 1, 2, 3 e 4:
 
+- Aula 1: principios REST, URIs em plural e JSON
+- Aula 2: setup do ambiente, primeira API, Postman e scripts npm
 - Aula 3: endpoints `GET`, busca por ID, filtro, ordenacao e paginacao
 - Aula 4: endpoint `POST`, `express.json()`, geracao de ID e validacoes
+
+## Setup do ambiente
+
+Segundo as aulas iniciais, o ambiente minimo fica assim:
+
+- Node.js instalado
+- npm funcionando
+- Postman instalado
+- Git configurado
 
 ## Como rodar
 
 ```bash
 npm install
 npm start
+```
+
+Para desenvolvimento com reinicio automatico:
+
+```bash
+npm run dev
 ```
 
 Servidor:
@@ -44,11 +61,16 @@ Resposta esperada:
 
 ```json
 {
-  "mensagem": "API de perifericos funcionando.",
-  "rotas": {
-    "listar": "GET /api/perifericos",
-    "filtrar": "GET /api/perifericos?categoria=mouse",
-    "ordenar": "GET /api/perifericos?ordem=preco&direcao=asc",
+    "mensagem": "API de perifericos funcionando.",
+    "status": "sucesso",
+    "timestamp": "2026-03-20T00:00:00.000Z",
+    "rotas": {
+      "me": "GET /api/me",
+      "data": "GET /api/data",
+      "random": "GET /api/random",
+      "listar": "GET /api/perifericos",
+      "filtrar": "GET /api/perifericos?categoria=mouse",
+      "ordenar": "GET /api/perifericos?ordem=preco&direcao=asc",
     "paginar": "GET /api/perifericos?pagina=1&limite=2",
     "buscarPorId": "GET /api/perifericos/1",
     "criar": "POST /api/perifericos"
@@ -56,7 +78,94 @@ Resposta esperada:
 }
 ```
 
-### 2. GET /api/perifericos
+### 2. GET /api/me
+
+Metodo:
+
+```http
+GET /api/me
+```
+
+URL completa:
+
+```http
+http://localhost:3000/api/me
+```
+
+Body:
+
+```json
+{}
+```
+
+Resposta esperada:
+
+```json
+{
+  "nome": "Gustavo",
+  "curso": "Engenharia de Software",
+  "hobbies": ["programar", "jogar", "testar API"],
+  "linguagens": ["JavaScript", "Python"]
+}
+```
+
+### 3. GET /api/data
+
+Metodo:
+
+```http
+GET /api/data
+```
+
+URL completa:
+
+```http
+http://localhost:3000/api/data
+```
+
+Body:
+
+```json
+{}
+```
+
+Resposta esperada:
+
+```json
+{
+  "data_hora": "2026-03-20T00:00:00.000Z"
+}
+```
+
+### 4. GET /api/random
+
+Metodo:
+
+```http
+GET /api/random
+```
+
+URL completa:
+
+```http
+http://localhost:3000/api/random
+```
+
+Body:
+
+```json
+{}
+```
+
+Resposta esperada:
+
+```json
+{
+  "numero": 42
+}
+```
+
+### 5. GET /api/perifericos
 
 Metodo:
 
@@ -90,7 +199,7 @@ Resposta esperada:
 ]
 ```
 
-### 3. GET /api/perifericos?categoria=mouse
+### 6. GET /api/perifericos?categoria=mouse
 
 Metodo:
 
@@ -124,7 +233,7 @@ Resposta esperada:
 ]
 ```
 
-### 4. GET /api/perifericos?ordem=preco&direcao=asc
+### 7. GET /api/perifericos?ordem=preco&direcao=asc
 
 Metodo:
 
@@ -158,7 +267,7 @@ Resposta esperada:
 ]
 ```
 
-### 5. GET /api/perifericos?pagina=1&limite=2
+### 8. GET /api/perifericos?pagina=1&limite=2
 
 Metodo:
 
@@ -207,7 +316,7 @@ Resposta esperada:
 }
 ```
 
-### 6. GET /api/perifericos/:id
+### 9. GET /api/perifericos/:id
 
 Metodo:
 
@@ -247,7 +356,7 @@ Resposta se nao encontrar:
 }
 ```
 
-### 7. POST /api/perifericos
+### 10. POST /api/perifericos
 
 Metodo:
 
@@ -293,6 +402,9 @@ Collection salva no arquivo:
 Requisicoes prontas na collection:
 
 - `GET /`
+- `GET /api/me`
+- `GET /api/data`
+- `GET /api/random`
 - `GET /api/perifericos`
 - `GET /api/perifericos?categoria=mouse`
 - `GET /api/perifericos?ordem=preco&direcao=asc`
@@ -380,6 +492,9 @@ npm start
 Depois disso, teste manualmente no Postman usando:
 
 - `GET http://localhost:3000/`
+- `GET http://localhost:3000/api/me`
+- `GET http://localhost:3000/api/data`
+- `GET http://localhost:3000/api/random`
 - `GET http://localhost:3000/api/perifericos`
 - `GET http://localhost:3000/api/perifericos?categoria=mouse`
 - `GET http://localhost:3000/api/perifericos?ordem=preco&direcao=asc`

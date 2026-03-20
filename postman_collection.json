@@ -21,6 +21,30 @@
       }
     },
     {
+      "name": "GET /api/me",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/me"
+      }
+    },
+    {
+      "name": "GET /api/data",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/data"
+      }
+    },
+    {
+      "name": "GET /api/random",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/random"
+      }
+    },
+    {
       "name": "GET /perifericos",
       "request": {
         "method": "GET",

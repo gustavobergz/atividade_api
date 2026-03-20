@@ -57,7 +57,12 @@ function resetarDados() {
 app.get("/", (_req, res) => {
   res.json({
     mensagem: "API de perifericos funcionando.",
+    status: "sucesso",
+    timestamp: new Date().toISOString(),
     rotas: {
+      me: "GET /api/me",
+      data: "GET /api/data",
+      random: "GET /api/random",
       listar: `GET ${ROTA_BASE}`,
       filtrar: `GET ${ROTA_BASE}?categoria=mouse`,
       ordenar: `GET ${ROTA_BASE}?ordem=preco&direcao=asc`,
@@ -65,6 +70,27 @@ app.get("/", (_req, res) => {
       buscarPorId: `GET ${ROTA_BASE}/1`,
       criar: `POST ${ROTA_BASE}`,
     },
+  });
+});
+
+app.get("/api/me", (_req, res) => {
+  res.json({
+    nome: "Gustavo",
+    curso: "Engenharia de Software",
+    hobbies: ["programar", "jogar", "testar API"],
+    linguagens: ["JavaScript", "Python"],
+  });
+});
+
+app.get("/api/data", (_req, res) => {
+  res.json({
+    data_hora: new Date().toISOString(),
+  });
+});
+
+app.get("/api/random", (_req, res) => {
+  res.json({
+    numero: Math.floor(Math.random() * 100) + 1,
   });
 });
 
