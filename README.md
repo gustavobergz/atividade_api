@@ -102,8 +102,8 @@ Resposta esperada:
 
 ```json
 {
-  "nome": "Gustavo",
-  "curso": "Engenharia de Software",
+  "nome": "Thiago Galtra",
+  "profissao": "Professor/Empresario",
   "hobbies": ["programar", "jogar", "testar API"],
   "linguagens": ["JavaScript", "Python"]
 }

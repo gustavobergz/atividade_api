@@ -75,8 +75,8 @@ app.get("/", (_req, res) => {
 
 app.get("/api/me", (_req, res) => {
   res.json({
-    nome: "Thiago Galvão",
-    curso: "Ciência da Computação",
+    nome: "Thiago Galtra",
+    profissao: "Professor/Empresario",
     hobbies: ["programar", "jogar", "testar API"],
     linguagens: ["JavaScript", "Python"],
   });
