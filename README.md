@@ -1,11 +1,12 @@
 # API de Perifericos
 
-API simples feita em Node.js com Express, alinhada com o que aparece nas aulas 1, 2, 3 e 4:
+API simples feita em Node.js com Express, alinhada com o que aparece nas aulas 1, 2, 3, 4 e 5:
 
 - Aula 1: principios REST, URIs em plural e JSON
 - Aula 2: setup do ambiente, primeira API, Postman e scripts npm
 - Aula 3: endpoints `GET`, busca por ID, filtro, ordenacao e paginacao
 - Aula 4: endpoint `POST`, `express.json()`, geracao de ID e validacoes
+- Aula 5: endpoints `PUT` e `DELETE`, completando o CRUD
 
 ## Setup do ambiente
 
@@ -73,7 +74,9 @@ Resposta esperada:
       "ordenar": "GET /api/perifericos?ordem=preco&direcao=asc",
     "paginar": "GET /api/perifericos?pagina=1&limite=2",
     "buscarPorId": "GET /api/perifericos/1",
-    "criar": "POST /api/perifericos"
+    "criar": "POST /api/perifericos",
+    "atualizar": "PUT /api/perifericos/1",
+    "remover": "DELETE /api/perifericos/1"
   }
 }
 ```
@@ -393,6 +396,69 @@ Resposta esperada:
 }
 ```
 
+### 11. PUT /api/perifericos/:id
+
+Metodo:
+
+```http
+PUT /api/perifericos/1
+```
+
+URL completa:
+
+```http
+http://localhost:3000/api/perifericos/1
+```
+
+Body:
+
+```json
+{
+  "nome": "Mouse Gamer Pro",
+  "categoria": "mouse",
+  "preco": 199,
+  "estoque": 14
+}
+```
+
+Resposta esperada:
+
+```json
+{
+  "id": 1,
+  "nome": "Mouse Gamer Pro",
+  "categoria": "mouse",
+  "preco": 199,
+  "estoque": 14
+}
+```
+
+### 12. DELETE /api/perifericos/:id
+
+Metodo:
+
+```http
+DELETE /api/perifericos/1
+```
+
+URL completa:
+
+```http
+http://localhost:3000/api/perifericos/1
+```
+
+Body:
+
+```json
+{}
+```
+
+Resposta esperada:
+
+```text
+204 No Content
+```
+
 ## Exemplos de requisicao no Postman
 
 Collection salva no arquivo:
@@ -416,6 +482,8 @@ Requisicoes prontas na collection:
 - `POST 4 - Webcam Full HD`
 - `POST 5 - Mousepad RGB`
 - `POST invalido`
+- `PUT /perifericos/1`
+- `DELETE /perifericos/1`
 
 ## 5 recursos criados via POST
 
@@ -458,7 +526,7 @@ Os 5 exemplos de criacao via POST estao na collection:
 
 ## Explicacao das validacoes implementadas
 
-No `POST /api/perifericos`, a API valida:
+No `POST /api/perifericos` e no `PUT /api/perifericos/:id`, a API valida:
 
 - `nome` obrigatorio
 - `categoria` obrigatoria
@@ -501,6 +569,8 @@ Depois disso, teste manualmente no Postman usando:
 - `GET http://localhost:3000/api/perifericos?pagina=1&limite=2`
 - `GET http://localhost:3000/api/perifericos/1`
 - `POST http://localhost:3000/api/perifericos`
+- `PUT http://localhost:3000/api/perifericos/1`
+- `DELETE http://localhost:3000/api/perifericos/1`
 
 ## Capturas de tela dos testes
 

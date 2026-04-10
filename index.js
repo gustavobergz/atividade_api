@@ -54,6 +54,72 @@ function resetarDados() {
   proximoId = 6;
 }
 
+function validarPeriferico(dados) {
+  const nome = dados.nome;
+  const categoria = dados.categoria;
+  const preco = dados.preco;
+  const estoque = dados.estoque ?? 0;
+
+  if (!nome || !categoria || preco === undefined) {
+    return {
+      valido: false,
+      erro: "Campos obrigatorios: nome, preco, categoria.",
+    };
+  }
+
+  if (typeof nome !== "string" || nome.trim().length < 3) {
+    return {
+      valido: false,
+      erro: "O nome deve ter pelo menos 3 caracteres.",
+    };
+  }
+
+  if (typeof categoria !== "string" || categoria.trim().length < 3) {
+    return {
+      valido: false,
+      erro: "A categoria deve ter pelo menos 3 caracteres.",
+    };
+  }
+
+  if (typeof preco !== "number" || Number.isNaN(preco)) {
+    return {
+      valido: false,
+      erro: "O preco deve ser um numero.",
+    };
+  }
+
+  if (preco <= 0) {
+    return {
+      valido: false,
+      erro: "O preco deve ser maior que zero.",
+    };
+  }
+
+  if (typeof estoque !== "number" || Number.isNaN(estoque)) {
+    return {
+      valido: false,
+      erro: "O estoque deve ser um numero.",
+    };
+  }
+
+  if (estoque < 0) {
+    return {
+      valido: false,
+      erro: "O estoque nao pode ser negativo.",
+    };
+  }
+
+  return {
+    valido: true,
+    dados: {
+      nome: nome.trim(),
+      categoria: categoria.trim(),
+      preco,
+      estoque,
+    },
+  };
+}
+
 app.get("/", (_req, res) => {
   res.json({
     mensagem: "API de perifericos funcionando.",
@@ -69,6 +135,8 @@ app.get("/", (_req, res) => {
       paginar: `GET ${ROTA_BASE}?pagina=1&limite=2`,
       buscarPorId: `GET ${ROTA_BASE}/1`,
       criar: `POST ${ROTA_BASE}`,
+      atualizar: `PUT ${ROTA_BASE}/1`,
+      remover: `DELETE ${ROTA_BASE}/1`,
     },
   });
 });
@@ -163,65 +231,64 @@ app.get(`${ROTA_BASE}/:id`, (req, res) => {
 });
 
 app.post(ROTA_BASE, (req, res) => {
-  const nome = req.body.nome;
-  const categoria = req.body.categoria;
-  const preco = req.body.preco;
-  const estoque = req.body.estoque ?? 0;
+  const validacao = validarPeriferico(req.body);
 
-  if (!nome || !categoria || preco === undefined) {
+  if (!validacao.valido) {
     return res.status(400).json({
-      erro: "Campos obrigatorios: nome, preco, categoria.",
-    });
-  }
-
-  if (typeof nome !== "string" || nome.trim().length < 3) {
-    return res.status(400).json({
-      erro: "O nome deve ter pelo menos 3 caracteres.",
-    });
-  }
-
-  if (typeof categoria !== "string" || categoria.trim().length < 3) {
-    return res.status(400).json({
-      erro: "A categoria deve ter pelo menos 3 caracteres.",
-    });
-  }
-
-  if (typeof preco !== "number" || Number.isNaN(preco)) {
-    return res.status(400).json({
-      erro: "O preco deve ser um numero.",
-    });
-  }
-
-  if (preco <= 0) {
-    return res.status(400).json({
-      erro: "O preco deve ser maior que zero.",
-    });
-  }
-
-  if (typeof estoque !== "number" || Number.isNaN(estoque)) {
-    return res.status(400).json({
-      erro: "O estoque deve ser um numero.",
-    });
-  }
-
-  if (estoque < 0) {
-    return res.status(400).json({
-      erro: "O estoque nao pode ser negativo.",
+      erro: validacao.erro,
     });
   }
 
   const novoPeriferico = {
     id: proximoId,
-    nome: nome.trim(),
-    categoria: categoria.trim(),
-    preco: preco,
-    estoque: estoque,
+    ...validacao.dados,
   };
 
-  proximoId = proximoId + 1;
+  proximoId += 1;
   perifericos.push(novoPeriferico);
 
   return res.status(201).json(novoPeriferico);
+});
+
+app.put(`${ROTA_BASE}/:id`, (req, res) => {
+  const id = Number(req.params.id);
+  const periferico = perifericos.find((item) => item.id === id);
+
+  if (!periferico) {
+    return res.status(404).json({
+      erro: "Periferico nao encontrado.",
+    });
+  }
+
+  const validacao = validarPeriferico(req.body);
+
+  if (!validacao.valido) {
+    return res.status(400).json({
+      erro: validacao.erro,
+    });
+  }
+
+  periferico.nome = validacao.dados.nome;
+  periferico.categoria = validacao.dados.categoria;
+  periferico.preco = validacao.dados.preco;
+  periferico.estoque = validacao.dados.estoque;
+
+  return res.json(periferico);
+});
+
+app.delete(`${ROTA_BASE}/:id`, (req, res) => {
+  const id = Number(req.params.id);
+  const indice = perifericos.findIndex((item) => item.id === id);
+
+  if (indice === -1) {
+    return res.status(404).json({
+      erro: "Periferico nao encontrado.",
+    });
+  }
+
+  perifericos.splice(indice, 1);
+
+  return res.status(204).send();
 });
 
 if (require.main === module) {

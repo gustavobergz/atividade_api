@@ -2,7 +2,7 @@
   "info": {
     "name": "API de Perifericos",
     "_postman_id": "5d12f536-7f8d-4f90-bec0-atividade-aula-4",
-    "description": "Collection da atividade da aula 4 com GET, filtro e POST para a API de perifericos.",
+    "description": "Collection da atividade das aulas 1 a 5 com GET, filtro, POST, PUT e DELETE para a API de perifericos.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -184,6 +184,31 @@
           "raw": "{\n  \"nome\": \"Produto sem preco\",\n  \"categoria\": \"mouse\"\n}"
         },
         "url": "{{baseUrl}}/api/perifericos"
+      }
+    },
+    {
+      "name": "PUT /perifericos/1",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Mouse Gamer Pro\",\n  \"categoria\": \"mouse\",\n  \"preco\": 199,\n  \"estoque\": 14\n}"
+        },
+        "url": "{{baseUrl}}/api/perifericos/1"
+      }
+    },
+    {
+      "name": "DELETE /perifericos/1",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/perifericos/1"
       }
     }
   ]
