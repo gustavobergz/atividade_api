@@ -1,577 +1,388 @@
-# API de Perifericos
+# Biblioteca API
 
-API simples feita em Node.js com Express, alinhada com o que aparece nas aulas 1, 2, 3, 4 e 5:
+API RESTful em Node.js + Express com persistencia 100% em SQLite. O projeto foi pensado como entrega final e cobre:
 
-- Aula 1: principios REST, URIs em plural e JSON
-- Aula 2: setup do ambiente, primeira API, Postman e scripts npm
-- Aula 3: endpoints `GET`, busca por ID, filtro, ordenacao e paginacao
-- Aula 4: endpoint `POST`, `express.json()`, geracao de ID e validacoes
-- Aula 5: endpoints `PUT` e `DELETE`, completando o CRUD
+- CRUD completo de livros e autores
+- autenticacao JWT
+- relacionamentos com `JOIN` entre `books`, `authors`, `genres` e `users`
+- filtros, ordenacao e paginacao
+- validacoes robustas
+- status codes corretos
+- seed automatica com 20 livros
+- testes automatizados
+- deploy pronto para Render
 
-## Setup do ambiente
+## Tema
 
-Segundo as aulas iniciais, o ambiente minimo fica assim:
+O tema escolhido foi **biblioteca**. A API permite cadastrar usuarios, autenticar com JWT e gerenciar autores, generos e livros.
 
-- Node.js instalado
-- npm funcionando
-- Postman instalado
-- Git configurado
+## Stack
 
-## Como rodar
+- Node.js 24
+- Express 5
+- SQLite via `node:sqlite`
+- JWT implementado com `crypto`
+- Testes com `node:test`
+
+## Como executar localmente
+
+1. Instale as dependencias:
 
 ```bash
 npm install
+```
+
+2. Rode o servidor:
+
+```bash
 npm start
 ```
 
-Para desenvolvimento com reinicio automatico:
-
-```bash
-npm run dev
-```
-
-Servidor:
+3. A API ficara disponivel em:
 
 ```text
 http://localhost:3000
 ```
 
-## Lista de todos os endpoints
-
-### 1. GET /
-
-Metodo:
-
-```http
-GET /
-```
-
-URL completa:
-
-```http
-http://localhost:3000/
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-    "mensagem": "API de perifericos funcionando.",
-    "status": "sucesso",
-    "timestamp": "2026-03-20T00:00:00.000Z",
-    "rotas": {
-      "me": "GET /api/me",
-      "data": "GET /api/data",
-      "random": "GET /api/random",
-      "listar": "GET /api/perifericos",
-      "filtrar": "GET /api/perifericos?categoria=mouse",
-      "ordenar": "GET /api/perifericos?ordem=preco&direcao=asc",
-    "paginar": "GET /api/perifericos?pagina=1&limite=2",
-    "buscarPorId": "GET /api/perifericos/1",
-    "criar": "POST /api/perifericos",
-    "atualizar": "PUT /api/perifericos/1",
-    "remover": "DELETE /api/perifericos/1"
-  }
-}
-```
-
-### 2. GET /api/me
-
-Metodo:
-
-```http
-GET /api/me
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/me
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-  "nome": "Thiago Galtra",
-  "profissao": "Professor/Empresario",
-  "hobbies": ["programar", "jogar", "testar API"],
-  "linguagens": ["JavaScript", "Python"]
-}
-```
-
-### 3. GET /api/data
-
-Metodo:
-
-```http
-GET /api/data
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/data
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-  "data_hora": "2026-03-20T00:00:00.000Z"
-}
-```
-
-### 4. GET /api/random
-
-Metodo:
-
-```http
-GET /api/random
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/random
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-  "numero": 42
-}
-```
-
-### 5. GET /api/perifericos
-
-Metodo:
-
-```http
-GET /api/perifericos
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-[
-  {
-    "id": 1,
-    "nome": "Mouse Gamer",
-    "categoria": "mouse",
-    "preco": 150,
-    "estoque": 12
-  }
-]
-```
-
-### 6. GET /api/perifericos?categoria=mouse
-
-Metodo:
-
-```http
-GET /api/perifericos?categoria=mouse
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos?categoria=mouse
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-[
-  {
-    "id": 1,
-    "nome": "Mouse Gamer",
-    "categoria": "mouse",
-    "preco": 150,
-    "estoque": 12
-  }
-]
-```
-
-### 7. GET /api/perifericos?ordem=preco&direcao=asc
-
-Metodo:
-
-```http
-GET /api/perifericos?ordem=preco&direcao=asc
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos?ordem=preco&direcao=asc
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-[
-  {
-    "id": 5,
-    "nome": "Mousepad RGB",
-    "categoria": "acessorio",
-    "preco": 70,
-    "estoque": 20
-  }
-]
-```
-
-### 8. GET /api/perifericos?pagina=1&limite=2
-
-Metodo:
-
-```http
-GET /api/perifericos?pagina=1&limite=2
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos?pagina=1&limite=2
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-  "dados": [
-    {
-      "id": 1,
-      "nome": "Mouse Gamer",
-      "categoria": "mouse",
-      "preco": 150,
-      "estoque": 12
-    },
-    {
-      "id": 2,
-      "nome": "Teclado Mecanico",
-      "categoria": "teclado",
-      "preco": 280,
-      "estoque": 8
-    }
-  ],
-  "paginacao": {
-    "pagina_atual": 1,
-    "itens_por_pagina": 2,
-    "total_itens": 5,
-    "total_paginas": 3
-  }
-}
-```
-
-### 9. GET /api/perifericos/:id
-
-Metodo:
-
-```http
-GET /api/perifericos/1
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos/1
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```json
-{
-  "id": 1,
-  "nome": "Mouse Gamer",
-  "categoria": "mouse",
-  "preco": 150,
-  "estoque": 12
-}
-```
-
-Resposta se nao encontrar:
-
-```json
-{
-  "erro": "Periferico nao encontrado."
-}
-```
-
-### 10. POST /api/perifericos
-
-Metodo:
-
-```http
-POST /api/perifericos
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos
-```
-
-Body:
-
-```json
-{
-  "nome": "Caixa de Som Bluetooth",
-  "categoria": "audio",
-  "preco": 450,
-  "estoque": 9
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "id": 6,
-  "nome": "Caixa de Som Bluetooth",
-  "categoria": "audio",
-  "preco": 450,
-  "estoque": 9
-}
-```
-
-### 11. PUT /api/perifericos/:id
-
-Metodo:
-
-```http
-PUT /api/perifericos/1
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos/1
-```
-
-Body:
-
-```json
-{
-  "nome": "Mouse Gamer Pro",
-  "categoria": "mouse",
-  "preco": 199,
-  "estoque": 14
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "id": 1,
-  "nome": "Mouse Gamer Pro",
-  "categoria": "mouse",
-  "preco": 199,
-  "estoque": 14
-}
-```
-
-### 12. DELETE /api/perifericos/:id
-
-Metodo:
-
-```http
-DELETE /api/perifericos/1
-```
-
-URL completa:
-
-```http
-http://localhost:3000/api/perifericos/1
-```
-
-Body:
-
-```json
-{}
-```
-
-Resposta esperada:
-
-```text
-204 No Content
-```
-
-## Exemplos de requisicao no Postman
-
-Collection salva no arquivo:
-
-`postman_collection.json`
-
-Requisicoes prontas na collection:
-
-- `GET /`
-- `GET /api/me`
-- `GET /api/data`
-- `GET /api/random`
-- `GET /api/perifericos`
-- `GET /api/perifericos?categoria=mouse`
-- `GET /api/perifericos?ordem=preco&direcao=asc`
-- `GET /api/perifericos?pagina=1&limite=2`
-- `GET /api/perifericos/1`
-- `POST 1 - Mouse Sem Fio`
-- `POST 2 - Teclado USB`
-- `POST 3 - Microfone`
-- `POST 4 - Webcam Full HD`
-- `POST 5 - Mousepad RGB`
-- `POST invalido`
-- `PUT /perifericos/1`
-- `DELETE /perifericos/1`
-
-## 5 recursos criados via POST
-
-Os 5 exemplos de criacao via POST estao na collection:
-
-```json
-[
-  {
-    "nome": "Mouse Sem Fio",
-    "categoria": "mouse",
-    "preco": 90,
-    "estoque": 10
-  },
-  {
-    "nome": "Teclado USB",
-    "categoria": "teclado",
-    "preco": 110,
-    "estoque": 7
-  },
-  {
-    "nome": "Microfone",
-    "categoria": "audio",
-    "preco": 230,
-    "estoque": 5
-  },
-  {
-    "nome": "Webcam Full HD",
-    "categoria": "video",
-    "preco": 180,
-    "estoque": 4
-  },
-  {
-    "nome": "Mousepad RGB",
-    "categoria": "acessorio",
-    "preco": 70,
-    "estoque": 11
-  }
-]
-```
-
-## Explicacao das validacoes implementadas
-
-No `POST /api/perifericos` e no `PUT /api/perifericos/:id`, a API valida:
-
-- `nome` obrigatorio
-- `categoria` obrigatoria
-- `preco` obrigatorio
-- `estoque` numerico quando enviado
-- `nome` com pelo menos 3 caracteres
-- `categoria` com pelo menos 3 caracteres
-- `preco` deve ser numero
-- `preco` deve ser maior que zero
-- `estoque` nao pode ser negativo
-
-Tambem usei `express.json()` para ler o body JSON e `proximoId` para gerar IDs automaticamente, exatamente no estilo mostrado na aula 4.
-
-Exemplo de erro:
-
-```json
-{
-  "erro": "Campos obrigatorios: nome, preco, categoria."
-}
-```
-
-## Testes manuais no localhost
-
-Para rodar a API localmente:
+## Scripts
 
 ```bash
-npm install
 npm start
+npm run dev
+npm test
 ```
 
-Depois disso, teste manualmente no Postman usando:
+## Variaveis de ambiente
 
-- `GET http://localhost:3000/`
-- `GET http://localhost:3000/api/me`
-- `GET http://localhost:3000/api/data`
-- `GET http://localhost:3000/api/random`
-- `GET http://localhost:3000/api/perifericos`
-- `GET http://localhost:3000/api/perifericos?categoria=mouse`
-- `GET http://localhost:3000/api/perifericos?ordem=preco&direcao=asc`
-- `GET http://localhost:3000/api/perifericos?pagina=1&limite=2`
-- `GET http://localhost:3000/api/perifericos/1`
-- `POST http://localhost:3000/api/perifericos`
-- `PUT http://localhost:3000/api/perifericos/1`
-- `DELETE http://localhost:3000/api/perifericos/1`
+Crie um arquivo `.env` se quiser personalizar:
 
-## Capturas de tela dos testes
+```env
+PORT=3000
+JWT_SECRET=troque-esta-chave
+DB_PATH=./data/library.sqlite
+```
 
-As capturas de tela devem ser feitas no Postman depois de testar a collection no seu `localhost`. O arquivo `postman_collection.json` ja esta pronto para importar.
+Se nenhuma variavel for informada, a API sobe com valores padrao.
+
+## Banco SQLite
+
+Ao iniciar a aplicacao, o banco SQLite e criado automaticamente em `data/library.sqlite`.
+
+Tabelas:
+
+- `users`
+- `authors`
+- `genres`
+- `books`
+
+Relacionamentos implementados:
+
+- `books.author_id -> authors.id`
+- `books.genre_id -> genres.id`
+- `books.created_by_user_id -> users.id`
+
+## Seed inicial
+
+A aplicacao sobe com:
+
+- 1 usuario administrador
+- 6 autores
+- 6 generos
+- 20 livros
+
+Credenciais iniciais:
+
+```json
+{
+  "email": "admin@biblioteca.dev",
+  "password": "Admin123!"
+}
+```
+
+## Rotas
+
+### Publicas
+
+#### `GET /`
+
+Status: `200 OK`
+
+Exemplo de resposta:
+
+```json
+{
+  "project": "Biblioteca API",
+  "status": "online",
+  "database": "SQLite",
+  "authentication": "JWT Bearer",
+  "seededRecords": 20
+}
+```
+
+#### `POST /api/auth/register`
+
+Cria um usuario e devolve token JWT.
+
+Body:
+
+```json
+{
+  "name": "Leitora Silva",
+  "email": "leitora@example.com",
+  "password": "Senha123"
+}
+```
+
+Status:
+
+- `201 Created`
+- `400 Bad Request`
+- `409 Conflict`
+
+#### `POST /api/auth/login`
+
+Body:
+
+```json
+{
+  "email": "admin@biblioteca.dev",
+  "password": "Admin123!"
+}
+```
+
+Status:
+
+- `200 OK`
+- `400 Bad Request`
+- `401 Unauthorized`
+
+#### `GET /api/genres`
+
+Lista generos com contagem de livros.
+
+Status: `200 OK`
+
+#### `GET /api/authors`
+
+Exemplo com filtro, ordenacao e paginacao:
+
+```http
+GET /api/authors?country=Brasil&search=Machado&sortBy=name&order=asc&page=1&limit=5
+```
+
+Status: `200 OK`
+
+#### `GET /api/authors/:id`
+
+Retorna um autor com seus livros.
+
+Status:
+
+- `200 OK`
+- `400 Bad Request`
+- `404 Not Found`
+
+#### `GET /api/books`
+
+Exemplo completo:
+
+```http
+GET /api/books?q=Harry&status=available&genreId=2&sortBy=publicationYear&order=desc&page=1&limit=3
+```
+
+Filtros suportados:
+
+- `q`
+- `status`
+- `authorId`
+- `genreId`
+- `yearMin`
+- `yearMax`
+
+Ordenacao suportada:
+
+- `title`
+- `publicationYear`
+- `pages`
+- `createdAt`
+
+Status: `200 OK`
+
+#### `GET /api/books/:id`
+
+Retorna um livro com dados relacionados de autor, genero e usuario criador.
+
+Status:
+
+- `200 OK`
+- `400 Bad Request`
+- `404 Not Found`
+
+### Protegidas por JWT
+
+Para as rotas abaixo envie:
+
+```http
+Authorization: Bearer <token>
+```
+
+#### `GET /api/profile`
+
+Retorna o perfil autenticado e estatisticas.
+
+#### `POST /api/authors`
+
+Body:
+
+```json
+{
+  "name": "Neil Gaiman",
+  "country": "Reino Unido",
+  "birthYear": 1960
+}
+```
+
+Status:
+
+- `201 Created`
+- `400 Bad Request`
+- `401 Unauthorized`
+
+#### `PUT /api/authors/:id`
+
+Atualiza um autor.
+
+#### `DELETE /api/authors/:id`
+
+Remove um autor sem livros vinculados.
+
+Status:
+
+- `204 No Content`
+- `401 Unauthorized`
+- `404 Not Found`
+- `409 Conflict`
+
+#### `POST /api/books`
+
+Body:
+
+```json
+{
+  "title": "Biblioteca em Testes",
+  "isbn": "978-65-0000-0001-0",
+  "publicationYear": 2024,
+  "pages": 220,
+  "status": "available",
+  "authorId": 1,
+  "genreId": 4
+}
+```
+
+Status:
+
+- `201 Created`
+- `400 Bad Request`
+- `401 Unauthorized`
+- `409 Conflict`
+
+#### `PUT /api/books/:id`
+
+Atualiza um livro existente.
+
+#### `DELETE /api/books/:id`
+
+Remove um livro existente.
+
+Status:
+
+- `204 No Content`
+- `401 Unauthorized`
+- `404 Not Found`
+
+## Validacoes implementadas
+
+### Usuarios
+
+- `name` minimo de 3 caracteres
+- `email` obrigatorio e valido
+- `password` minimo de 6 caracteres
+- email unico
+
+### Autores
+
+- `name` minimo de 3 caracteres
+- `country` minimo de 2 caracteres
+- `birthYear` entre 1500 e ano atual
+
+### Livros
+
+- `title` minimo de 2 caracteres
+- `isbn` com pelo menos 10 caracteres e formato alfanumerico
+- `publicationYear` entre 1450 e o ano seguinte ao atual
+- `pages` entre 1 e 5000
+- `status` limitado a `available`, `borrowed`, `maintenance`
+- `authorId` e `genreId` obrigatorios e positivos
+- ISBN unico
+- validacao de existencia de autor e genero
+
+## Testes automatizados
+
+Rode:
+
+```bash
+npm test
+```
+
+Os testes cobrem:
+
+- healthcheck
+- login e registro
+- autenticacao JWT
+- filtros, paginacao e ordenacao
+- CRUD de livros
+- regra de conflito ao excluir autor com livros vinculados
+
+## Postman
+
+A collection exportada esta em:
+
+```text
+postman_collection.json
+```
+
+Ela inclui exemplos de todas as rotas, com variaveis `baseUrl` e `token`.
+
+Fluxo sugerido no Postman:
+
+1. Executar `Login`
+2. Copiar o token retornado
+3. Salvar na variavel `token`
+4. Testar as rotas protegidas
+
+## Deploy
+
+O repositorio inclui `render.yaml` para deploy no Render.
+
+Configuracao usada:
+
+- Build command: `npm install`
+- Start command: `npm start`
+- Runtime: Node
+
+Tambem funciona em Railway com as mesmas variaveis de ambiente.
+
+## Estrutura principal
+
+```text
+.
+|-- index.js
+|-- server.js
+|-- src/
+|   |-- database.js
+|   |-- security.js
+|   `-- validation.js
+|-- index.test.js
+|-- postman_collection.json
+`-- render.yaml
+```

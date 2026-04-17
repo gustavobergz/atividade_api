@@ -1,259 +1,267 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { app, resetarDados } = require("./index");
+const fs = require("node:fs");
+const path = require("node:path");
+const { createApp } = require("./index");
+
+const TEST_DB_PATH = path.join(__dirname, "tmp", "library.test.sqlite");
 
 let server;
 let baseUrl;
+let helpers;
+
+function removeTestDatabase() {
+  if (fs.existsSync(TEST_DB_PATH)) {
+    fs.rmSync(TEST_DB_PATH, { force: true });
+  }
+}
+
+async function loginAsAdmin() {
+  const response = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: "admin@biblioteca.dev",
+      password: "Admin123!",
+    }),
+  });
+
+  const data = await response.json();
+  return data.token;
+}
 
 test.before(async () => {
-  server = app.listen(0);
+  removeTestDatabase();
+  helpers = createApp({
+    dbPath: TEST_DB_PATH,
+    jwtSecret: "test-secret",
+  });
+  server = helpers.app.listen(0);
+
   await new Promise((resolve) => {
     server.on("listening", resolve);
   });
-  const { port } = server.address();
-  baseUrl = `http://127.0.0.1:${port}`;
+
+  baseUrl = `http://127.0.0.1:${server.address().port}`;
 });
 
 test.beforeEach(() => {
-  resetarDados();
+  helpers.reset();
 });
 
 test.after(async () => {
   await new Promise((resolve, reject) => {
-    server.close((erro) => {
-      if (erro) {
-        reject(erro);
+    server.close((error) => {
+      if (error) {
+        reject(error);
         return;
       }
 
       resolve();
     });
   });
+
+  helpers.close();
+  removeTestDatabase();
 });
 
-test("GET / retorna informacoes da API", async () => {
-  const resposta = await fetch(`${baseUrl}/`);
-  const dados = await resposta.json();
+test("GET / retorna metadados do projeto e quantidade seedada", async () => {
+  const response = await fetch(`${baseUrl}/`);
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.status, "sucesso");
-  assert.equal(dados.rotas.atualizar, "PUT /api/perifericos/1");
-  assert.equal(dados.rotas.remover, "DELETE /api/perifericos/1");
+  assert.equal(response.status, 200);
+  assert.equal(data.project, "Biblioteca API");
+  assert.equal(data.seededRecords, 20);
+  assert.equal(data.authentication, "JWT Bearer");
 });
 
-test("GET /api/me retorna dados fixos", async () => {
-  const resposta = await fetch(`${baseUrl}/api/me`);
-  const dados = await resposta.json();
+test("POST /api/auth/login autentica com usuario seedado", async () => {
+  const response = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: "admin@biblioteca.dev",
+      password: "Admin123!",
+    }),
+  });
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.nome, "Thiago Galtra");
-  assert.ok(Array.isArray(dados.hobbies));
+  assert.equal(response.status, 200);
+  assert.ok(data.token);
+  assert.equal(data.user.email, "admin@biblioteca.dev");
 });
 
-test("GET /api/data retorna uma data ISO", async () => {
-  const resposta = await fetch(`${baseUrl}/api/data`);
-  const dados = await resposta.json();
+test("POST /api/auth/register cria usuario novo", async () => {
+  const response = await fetch(`${baseUrl}/api/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: "Leitora Teste",
+      email: "leitora@example.com",
+      password: "Senha123",
+    }),
+  });
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.ok(!Number.isNaN(Date.parse(dados.data_hora)));
+  assert.equal(response.status, 201);
+  assert.equal(data.user.email, "leitora@example.com");
+  assert.ok(data.token);
 });
 
-test("GET /api/random retorna numero entre 1 e 100", async () => {
-  const resposta = await fetch(`${baseUrl}/api/random`);
-  const dados = await resposta.json();
+test("GET /api/profile exige autenticacao JWT", async () => {
+  const response = await fetch(`${baseUrl}/api/profile`);
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(typeof dados.numero, "number");
-  assert.ok(dados.numero >= 1 && dados.numero <= 100);
+  assert.equal(response.status, 401);
+  assert.equal(data.error, "Token JWT ausente ou mal formatado.");
 });
 
-test("GET /perifericos retorna a lista inicial", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos`);
-  const dados = await resposta.json();
+test("GET /api/profile retorna dados do usuario autenticado", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.length, 5);
-  assert.equal(dados[0].estoque, 12);
+  assert.equal(response.status, 200);
+  assert.equal(data.user.email, "admin@biblioteca.dev");
+  assert.equal(data.statistics.createdBooks, 20);
 });
 
-test("GET /perifericos filtra por categoria", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos?categoria=mouse`);
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.length, 1);
-  assert.equal(dados[0].categoria, "mouse");
-});
-
-test("GET /api/perifericos ordena por preco", async () => {
-  const resposta = await fetch(
-    `${baseUrl}/api/perifericos?ordem=preco&direcao=asc`
+test("GET /api/books suporta filtro, ordenacao e paginacao com JOINs", async () => {
+  const response = await fetch(
+    `${baseUrl}/api/books?status=available&genreId=2&sortBy=publicationYear&order=desc&page=1&limit=3`
   );
-  const dados = await resposta.json();
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(dados[0].nome, "Mousepad RGB");
+  assert.equal(response.status, 200);
+  assert.equal(data.data.length, 3);
+  assert.equal(data.pagination.page, 1);
+  assert.ok(data.data[0].author.name);
+  assert.ok(data.data[0].genre.name);
+  assert.ok(data.data[0].createdBy.email);
 });
 
-test("GET /api/perifericos pagina resultados", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos?pagina=1&limite=2`);
-  const dados = await resposta.json();
+test("GET /api/authors lista autores com total de livros", async () => {
+  const response = await fetch(`${baseUrl}/api/authors?country=Brasil&limit=5`);
+  const data = await response.json();
 
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.dados.length, 2);
-  assert.equal(dados.paginacao.pagina_atual, 1);
-  assert.equal(dados.paginacao.total_itens, 5);
+  assert.equal(response.status, 200);
+  assert.equal(data.data.length, 2);
+  assert.ok(data.data.every((author) => typeof author.total_books === "number"));
 });
 
-test("GET /perifericos/:id retorna um periferico", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/1`);
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.id, 1);
-  assert.equal(dados.nome, "Mouse Gamer");
-});
-
-test("POST /perifericos cria um novo periferico", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos`, {
+test("POST /api/books cria livro novo autenticado", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/books`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      nome: "Caixa de Som Bluetooth",
-      categoria: "audio",
-      preco: 450,
-      estoque: 9,
+      title: "Biblioteca em Testes",
+      isbn: "978-65-0000-0001-0",
+      publicationYear: 2024,
+      pages: 220,
+      status: "available",
+      authorId: 1,
+      genreId: 4,
     }),
   });
+  const data = await response.json();
 
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 201);
-  assert.equal(dados.id, 6);
-  assert.equal(dados.nome, "Caixa de Som Bluetooth");
-  assert.equal(dados.preco, 450);
+  assert.equal(response.status, 201);
+  assert.equal(data.title, "Biblioteca em Testes");
+  assert.equal(data.author.id, 1);
+  assert.equal(data.genre.id, 4);
 });
 
-test("POST /perifericos exige nome e categoria", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos`, {
+test("POST /api/books valida ISBN duplicado", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/books`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      nome: "Produto sem categoria",
+      title: "Livro Repetido",
+      isbn: "978-85-359-0277-5",
+      publicationYear: 2020,
+      pages: 180,
+      status: "available",
+      authorId: 1,
+      genreId: 4,
     }),
   });
+  const data = await response.json();
 
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 400);
-  assert.equal(dados.erro, "Campos obrigatorios: nome, preco, categoria.");
+  assert.equal(response.status, 409);
+  assert.equal(data.error, "Ja existe um livro cadastrado com esse ISBN.");
 });
 
-test("POST /perifericos valida preco invalido", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      nome: "Mouse com preco ruim",
-      categoria: "mouse",
-      preco: -20,
-    }),
-  });
-
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 400);
-  assert.equal(dados.erro, "O preco deve ser maior que zero.");
-});
-
-test("PUT /perifericos/:id atualiza um periferico existente", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/2`, {
+test("PUT /api/books/:id atualiza livro existente", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/books/1`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      nome: "Teclado Mecanico RGB",
-      categoria: "teclado",
-      preco: 320,
-      estoque: 10,
+      title: "Dom Casmurro - Edicao Revisada",
+      isbn: "978-85-359-0277-5",
+      publicationYear: 1899,
+      pages: 300,
+      status: "maintenance",
+      authorId: 1,
+      genreId: 4,
     }),
   });
+  const data = await response.json();
 
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 200);
-  assert.equal(dados.id, 2);
-  assert.equal(dados.nome, "Teclado Mecanico RGB");
-  assert.equal(dados.preco, 320);
-  assert.equal(dados.estoque, 10);
+  assert.equal(response.status, 200);
+  assert.equal(data.pages, 300);
+  assert.equal(data.status, "maintenance");
 });
 
-test("PUT /perifericos/:id retorna 404 para item inexistente", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/999`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      nome: "Produto Fantasma",
-      categoria: "audio",
-      preco: 150,
-      estoque: 1,
-    }),
-  });
-
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 404);
-  assert.equal(dados.erro, "Periferico nao encontrado.");
-});
-
-test("PUT /perifericos/:id valida campos obrigatorios", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/1`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      nome: "Mouse Atualizado",
-      preco: 199,
-    }),
-  });
-
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 400);
-  assert.equal(dados.erro, "Campos obrigatorios: nome, preco, categoria.");
-});
-
-test("DELETE /perifericos/:id remove um periferico", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/3`, {
+test("DELETE /api/books/:id remove livro existente", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/books/20`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
-  assert.equal(resposta.status, 204);
+  assert.equal(response.status, 204);
 
-  const respostaLista = await fetch(`${baseUrl}/api/perifericos`);
-  const dadosLista = await respostaLista.json();
-
-  assert.equal(dadosLista.length, 4);
-  assert.equal(dadosLista.some((item) => item.id === 3), false);
+  const followUp = await fetch(`${baseUrl}/api/books/20`);
+  assert.equal(followUp.status, 404);
 });
 
-test("DELETE /perifericos/:id retorna 404 para item inexistente", async () => {
-  const resposta = await fetch(`${baseUrl}/api/perifericos/999`, {
+test("DELETE /api/authors/:id bloqueia exclusao quando ha livros relacionados", async () => {
+  const token = await loginAsAdmin();
+  const response = await fetch(`${baseUrl}/api/authors/1`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+  const data = await response.json();
 
-  const dados = await resposta.json();
-
-  assert.equal(resposta.status, 404);
-  assert.equal(dados.erro, "Periferico nao encontrado.");
+  assert.equal(response.status, 409);
+  assert.equal(
+    data.error,
+    "Nao e possivel remover um autor que ainda possui livros vinculados."
+  );
 });

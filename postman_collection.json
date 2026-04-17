@@ -1,91 +1,38 @@
 {
   "info": {
-    "name": "API de Perifericos",
-    "_postman_id": "5d12f536-7f8d-4f90-bec0-atividade-aula-4",
-    "description": "Collection da atividade das aulas 1 a 5 com GET, filtro, POST, PUT e DELETE para a API de perifericos.",
+    "_postman_id": "5a4b35f2-6f0b-4b5f-99d2-atividade-api-library",
+    "name": "Biblioteca API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
     }
   ],
   "item": [
     {
-      "name": "GET /",
+      "name": "Healthcheck",
       "request": {
         "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/"
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        }
       }
     },
     {
-      "name": "GET /api/me",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/me"
-      }
-    },
-    {
-      "name": "GET /api/data",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/data"
-      }
-    },
-    {
-      "name": "GET /api/random",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/random"
-      }
-    },
-    {
-      "name": "GET /perifericos",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/perifericos"
-      }
-    },
-    {
-      "name": "GET /perifericos?categoria=mouse",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/perifericos?categoria=mouse"
-      }
-    },
-    {
-      "name": "GET /perifericos?ordem=preco&direcao=asc",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/perifericos?ordem=preco&direcao=asc"
-      }
-    },
-    {
-      "name": "GET /perifericos?pagina=1&limite=2",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/perifericos?pagina=1&limite=2"
-      }
-    },
-    {
-      "name": "GET /perifericos/1",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/perifericos/1"
-      }
-    },
-    {
-      "name": "POST 1 - Mouse Sem Fio",
+      "name": "Register",
       "request": {
         "method": "POST",
         "header": [
@@ -96,13 +43,23 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Mouse Sem Fio\",\n  \"categoria\": \"mouse\",\n  \"preco\": 90,\n  \"estoque\": 10\n}"
+          "raw": "{\n  \"name\": \"Leitora Postman\",\n  \"email\": \"leitora.postman@example.com\",\n  \"password\": \"Senha123\"\n}"
         },
-        "url": "{{baseUrl}}/api/perifericos"
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
       }
     },
     {
-      "name": "POST 2 - Teclado USB",
+      "name": "Login",
       "request": {
         "method": "POST",
         "header": [
@@ -113,102 +70,352 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Teclado USB\",\n  \"categoria\": \"teclado\",\n  \"preco\": 110,\n  \"estoque\": 7\n}"
+          "raw": "{\n  \"email\": \"admin@biblioteca.dev\",\n  \"password\": \"Admin123!\"\n}"
         },
-        "url": "{{baseUrl}}/api/perifericos"
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
       }
     },
     {
-      "name": "POST 3 - Microfone",
+      "name": "Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profile"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Genres",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/genres",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "genres"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Authors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/authors?country=Brasil&search=Machado&sortBy=name&order=asc&page=1&limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "authors"
+          ],
+          "query": [
+            {
+              "key": "country",
+              "value": "Brasil"
+            },
+            {
+              "key": "search",
+              "value": "Machado"
+            },
+            {
+              "key": "sortBy",
+              "value": "name"
+            },
+            {
+              "key": "order",
+              "value": "asc"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Author By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/authors/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "authors",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Author",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Content-Type",
             "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Microfone\",\n  \"categoria\": \"audio\",\n  \"preco\": 230,\n  \"estoque\": 5\n}"
-        },
-        "url": "{{baseUrl}}/api/perifericos"
-      }
-    },
-    {
-      "name": "POST 4 - Webcam Full HD",
-      "request": {
-        "method": "POST",
-        "header": [
+          },
           {
-            "key": "Content-Type",
-            "value": "application/json"
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Webcam Full HD\",\n  \"categoria\": \"video\",\n  \"preco\": 180,\n  \"estoque\": 4\n}"
+          "raw": "{\n  \"name\": \"Neil Gaiman\",\n  \"country\": \"Reino Unido\",\n  \"birthYear\": 1960\n}"
         },
-        "url": "{{baseUrl}}/api/perifericos"
+        "url": {
+          "raw": "{{baseUrl}}/api/authors",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "authors"
+          ]
+        }
       }
     },
     {
-      "name": "POST 5 - Mousepad RGB",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Mousepad RGB\",\n  \"categoria\": \"acessorio\",\n  \"preco\": 70,\n  \"estoque\": 11\n}"
-        },
-        "url": "{{baseUrl}}/api/perifericos"
-      }
-    },
-    {
-      "name": "POST invalido",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Produto sem preco\",\n  \"categoria\": \"mouse\"\n}"
-        },
-        "url": "{{baseUrl}}/api/perifericos"
-      }
-    },
-    {
-      "name": "PUT /perifericos/1",
+      "name": "Update Author",
       "request": {
         "method": "PUT",
         "header": [
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Mouse Gamer Pro\",\n  \"categoria\": \"mouse\",\n  \"preco\": 199,\n  \"estoque\": 14\n}"
+          "raw": "{\n  \"name\": \"Neil Richard Gaiman\",\n  \"country\": \"Reino Unido\",\n  \"birthYear\": 1960\n}"
         },
-        "url": "{{baseUrl}}/api/perifericos/1"
+        "url": {
+          "raw": "{{baseUrl}}/api/authors/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "authors",
+            "7"
+          ]
+        }
       }
     },
     {
-      "name": "DELETE /perifericos/1",
+      "name": "Delete Author",
       "request": {
         "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/authors/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "authors",
+            "7"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Books",
+      "request": {
+        "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/api/perifericos/1"
+        "url": {
+          "raw": "{{baseUrl}}/api/books?q=Harry&status=available&genreId=2&sortBy=publicationYear&order=desc&page=1&limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "books"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "Harry"
+            },
+            {
+              "key": "status",
+              "value": "available"
+            },
+            {
+              "key": "genreId",
+              "value": "2"
+            },
+            {
+              "key": "sortBy",
+              "value": "publicationYear"
+            },
+            {
+              "key": "order",
+              "value": "desc"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Book By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/books/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Book",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Biblioteca em Testes\",\n  \"isbn\": \"978-65-0000-0001-0\",\n  \"publicationYear\": 2024,\n  \"pages\": 220,\n  \"status\": \"available\",\n  \"authorId\": 1,\n  \"genreId\": 4\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "books"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Book",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Biblioteca em Testes - 2a Edicao\",\n  \"isbn\": \"978-65-0000-0001-0\",\n  \"publicationYear\": 2025,\n  \"pages\": 240,\n  \"status\": \"maintenance\",\n  \"authorId\": 1,\n  \"genreId\": 4\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/books/21",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "21"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Book",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/books/21",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "21"
+          ]
+        }
       }
     }
   ]
